@@ -1,39 +1,48 @@
 # Neural Network Structure Simulator (NNSS)
 
-## Prerequisites
+### Prerequisites
 - Development Environment
     - Ubuntu Linux
     - IDK installation protocols for other linux distros, but it is possible.
     - If on Windows, use WSL:
+      
         ```
         wsl --install
         ```
+        
         or
+      
         ```
         wsl --install ubuntu
         ```
+        
     - No MacOS support for now.
 
 - Libraries
-    Install git & cmake
+
+    Install git & cmake.
+  
     ```
     sudo apt update
     sudo apt install build-essential git cmake
     ```
 
-    Install DX11 developer tools
+    Install DX11 developer tools.
+  
     ```
     sudo apt update
     sudo apt install libx11-dev libxrandr-dev libxi-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev
     ```
 
-    Make some directory to store C Libraries
+    Make some directory to store C Libraries.
+  
     ```
     mkdir C-libs
     cd C-libs
     ```
 
-    Clone & build raylib (graphics library)
+    Clone & build raylib (graphics library).
+  
     ```
     git clone https://github.com/raysan5/raylib.git
     cd raylib
@@ -45,8 +54,11 @@
     ```
 
 ### Build & Run Application
-In the root directory, run the following command.
-```
-gcc main.c -o main -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 && ./main
-```
-It should work.
+- In the root directory, run the following command.
+
+
+    ```
+    gcc -g main.c grid/grid.c helper/helper.c -o app.exe -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 && ./app.exe    
+    ```
+    
+- It should work.
