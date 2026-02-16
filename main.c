@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define WINDOW_SIZE 1000
-#define GRID_SLICES 120
-#define NEURON_PROB 0.012f
+#define WINDOW_SIZE 750
+#define GRID_SLICES 50
+#define NEURON_PROB 0.025f
 
 int main() {
     srand(time(NULL));
