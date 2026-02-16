@@ -5,21 +5,26 @@
 #include <math.h>
 #include "../helper/helper.h"
 #include <float.h>
+#include "raymath.h"
 
 size_t window_size_g = 750;
 size_t slices_g = 50;
 float spacing_g = 15.0f;
+size_t neurons_created = 0;
 
 float** grid_values = NULL;
 bool** is_neuron = NULL;
 Vector2DA neurons = {0};
+Vector2 ref_point = {0};
 
 void initGrid(size_t window_size, size_t slices) {
+    neurons_created = 0;
     window_size_g = window_size;
     slices_g = slices;
     spacing_g = (float) window_size / slices;
     grid_values = (float**) calloc(slices, sizeof(float*));
     is_neuron = (bool**) calloc(slices, sizeof(bool*));
+    neurons.count = 0;
 
     for (size_t i = 0; i < slices; ++i) {
         grid_values[i] = (float*) calloc(slices, sizeof(float));
@@ -156,6 +161,7 @@ void createNeurons() {
         for (size_t j = 0; j < slices_g; ++j) {
             new_is_neuron[i][j] = isMaxima(i, j) | is_neuron[i][j];
             if (isMaxima(i, j) && !is_neuron[i][j]) {
+                neurons_created++;
                 da_append(neurons, ((Vector2) {(j * spacing_g) + (spacing_g / 2.0f), (i * spacing_g) + (spacing_g / 2.0f)}));
             }
 
@@ -188,14 +194,47 @@ void colorGrid(bool color_neurons) {
     }
 }
 
-void zeroGridValues() {
+int pointsCompar(const void *a, const void *b) {
+    const Vector2 *pa = a;
+    const Vector2 *pb = b;
 
+    float da = Vector2Distance(ref_point, *pa);
+    float db = Vector2Distance(ref_point, *pb);
+
+    if (da < db) return -1;
+    if (da > db) return 1;
+    return 0;
 }
 
 void connectNeurons() {
+    Vector2* neurons_coord_copy = NULL;
+    copy_arr(neurons_coord_copy, neurons.items, neurons.count);
+    for (size_t i = 0; i < neurons.count; ++i) {
+        ref_point = neurons.items[i];
+        qsort(neurons_coord_copy, neurons.count, sizeof(Vector2), pointsCompar);
+        size_t row = (size_t) ((ref_point.y - (spacing_g / 2.0f)) / spacing_g);
+        size_t col = (size_t) ((ref_point.x - (spacing_g / 2.0)) / spacing_g);
+        float point_intensity = grid_values[row][col];
+
+        size_t num_connections = floor(point_intensity * neurons.count);
+        if (num_connections < 2) num_connections = 2;
+
+        for (size_t j = 1; j < num_connections; ++j) {
+            DrawLineV(ref_point, neurons_coord_copy[j], WHITE);
+        }
+    }
+
+    free(neurons_coord_copy);
+}
+
+void zeroGridValues() {
      for (size_t i = 0; i < slices_g; ++i) {
         for (size_t j = 0; j < slices_g; ++j) {
             grid_values[i][j] = 0.0f;
         }
      }
+}
+
+size_t numNewNeurons() {
+    return neurons_created;
 }

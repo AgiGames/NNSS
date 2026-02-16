@@ -17,6 +17,7 @@ int main() {
 
     bool show_grid = true;
     bool color_neurons = true;
+    bool show_connections = true;
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -36,23 +37,30 @@ int main() {
             color_neurons = !color_neurons;
         }
 
+        if (IsKeyPressed(KEY_C)) {
+            show_connections = !show_connections;
+        }
+
         if (IsKeyPressed(KEY_I)) {
             expungeGaussian();
             createNeurons();
-            zeroGridValues();
+            // zeroGridValues();
         }
 
         if (IsKeyPressed(KEY_E)) {
             expungeGaussian();
         }
 
-        if (IsKeyPressed(KEY_C)) {
-            createNeurons();
-        }
-
         if (show_grid) {
             colorGrid(color_neurons);
         }
+
+        if (show_connections) {
+            connectNeurons();
+        }
+
+        const char* neurons_created_text = TextFormat("%zu", numNewNeurons());
+        DrawText(neurons_created_text, 10, 10, 50, GREEN);
 
         EndDrawing();
     }

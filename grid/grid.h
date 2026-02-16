@@ -12,5 +12,7 @@ void scatterNeurons(float neuron_prob);
 void expungeGaussian();
 void createNeurons();
 void zeroGridValues();
+size_t numNewNeurons();
+void connectNeurons();
 
 #endif

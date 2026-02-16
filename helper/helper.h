@@ -15,6 +15,14 @@
         xs.items[xs.count++] = x; \
     } while(0)
 
+#define copy_arr(dest, source, source_len) \
+    do { \
+        dest = calloc(source_len, sizeof(*source)); \
+        for (size_t mi = 0; mi < source_len; ++mi) { \
+            dest[mi] = source[mi]; \
+        } \
+    } while(0)
+
 typedef struct {
     Vector2* items;
     size_t count;
