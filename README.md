@@ -1,4 +1,15 @@
 # Neural Network Structure Simulator (NNSS)
+A program that simulates how neurons connect with eachother in the brain!
+
+Before Iteration:
+
+
+First Iteration:
+
+
+Last Iteration:
+
+
 
 ### Prerequisites
 - Development Environment
