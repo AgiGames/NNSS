@@ -219,8 +219,18 @@ void connectNeurons() {
         size_t num_connections = floor(point_intensity * neurons.count);
         if (num_connections < 2) num_connections = 2;
 
-        for (size_t j = 1; j < num_connections; ++j) {
-            DrawLineV(ref_point, neurons_coord_copy[j], WHITE);
+        for (size_t j = 0; j < num_connections; ++j) {
+            if (j + 1 < neurons.count) {
+                Vector2 j_closest_point = neurons_coord_copy[j + 1];
+                size_t j_row = (size_t) ((j_closest_point.y - (spacing_g / 2.0f)) / spacing_g);
+                size_t j_col = (size_t) ((j_closest_point.x - (spacing_g / 2.0f)) / spacing_g);
+                
+                if (gaussian2d_1std(j_col, j_row, col, row) < 0.1) {
+                    continue;
+                }
+
+                DrawLineV(ref_point, neurons_coord_copy[j + 1], WHITE);
+            }
         }
     }
 
