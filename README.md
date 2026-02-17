@@ -3,15 +3,11 @@ A program that simulates formation of filaments from densities.
 
 Before Iteration:
 
-![](https://github.com/AgiGames/NNSS/blob/main/images/0th_iteration.png)
-
-First Iteration:
-
-![](https://github.com/AgiGames/NNSS/blob/main/images/1st_iteration.png)
+![](https://github.com/AgiGames/Filamenta/blob/main/images/0th_iteration.png)
 
 Last Iteration:
 
-![](https://github.com/AgiGames/NNSS/blob/main/images/nth_iteration.png)
+![](https://github.com/AgiGames/Filamenta/blob/main/images/nth_iteration.png)
 
 ### Prerequisites
 - Development Environment
