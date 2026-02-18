@@ -28,36 +28,37 @@ int main() {
             init_grid(WINDOW_SIZE, GRID_SLICES);
             scatter_accumulators(ACCUMULATOR_PROB);
         }
-
-        if (IsKeyPressed(KEY_H)) {
+        if (IsKeyPressed(KEY_G)) {
             show_grid = !show_grid;
         }
-
-        if (IsKeyPressed(KEY_N)) {
+        if (IsKeyPressed(KEY_A)) {
             color_accumulators = !color_accumulators;
         }
-
         if (IsKeyPressed(KEY_C)) {
             show_connections = !show_connections;
         }
-
-        if (IsKeyPressed(KEY_I)) {
+        if (IsKeyDown(KEY_LEFT_SHIFT) && IsKeyPressed(KEY_I)) {
+            do_n_iterations();
+        }
+        else if (IsKeyPressed(KEY_I)) {
             expunge_gaussian();
             create_accumulators();
-        }
-
-        if (IsKeyPressed(KEY_E)) {
-            expunge_gaussian();
-        }
+        }  
+        
+        // debug key listeners...
+        // if (IsKeyPressed(KEY_L)) {
+        //     create_accumulators();
+        // }
+        // if (IsKeyPressed(KEY_E)) {
+        //     expunge_gaussian();
+        // }
 
         if (show_grid) {
             color_grid(color_accumulators);
         }
-
         if (show_connections) {
             connect_accumulators();
         }
-
         const char* num_accumulators_text = TextFormat("%zu", get_num_accumulators());
         DrawText(num_accumulators_text, 10, 10, 50, GREEN);
 

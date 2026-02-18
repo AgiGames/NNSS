@@ -17,21 +17,23 @@
 
 #define COPY_ARR(dest, source, source_len) \
     do { \
-        dest = calloc(source_len, sizeof(*source)); \
-        for (size_t copy_arr_i = 0; copy_arr_i < source_len; ++copy_arr_i) { \
+        dest = calloc((source_len), sizeof(*source)); \
+        for (size_t copy_arr_i = 0; copy_arr_i < (source_len); ++copy_arr_i) { \
             dest[copy_arr_i] = source[copy_arr_i]; \
         } \
     } while(0)
 
+// not using this function anywhere in the code base, kept it because might need it in the future
 #define FREE_2D_ARR(arr, arr_len) \
     do { \
-        for (size_t free_2d_arr_i = 0; free_2d_arr_i < arr_len; ++free_2d_arr_i) { \
+        for (size_t free_2d_arr_i = 0; free_2d_arr_i < (arr_len); ++free_2d_arr_i) { \
             free(arr[free_2d_arr_i]); \
         } \
         free(arr); \
         arr = NULL; \
     } while(0)
 
+// not using this function anywhere in the code base, kept it because might need it in the future
 #define ZERO_2D_ARR(arr, rows, cols) \
     do { \
         for (size_t zero_2d_arr_i = 0; zero_2d_arr_i < rows; ++zero_2d_arr_i) { \
