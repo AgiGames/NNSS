@@ -1,12 +1,6 @@
 # Filamenta
 A program that simulates formation of filaments from densities.
 
-Before Iteration:
-
-![](https://github.com/AgiGames/Filamenta/blob/main/images/0th_iteration.png)
-
-Last Iteration:
-
 ![](https://github.com/AgiGames/Filamenta/blob/main/images/nth_iteration.png)
 
 ### Prerequisites
