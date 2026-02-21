@@ -12,7 +12,7 @@ size_t window_size_g = 750;
 size_t slices_g = 50;
 float spacing_g = 15.0f;
 size_t num_accumulators = 0;
-size_t stddev = 10;
+size_t stddev = 4;
 
 float *grid_values = NULL;
 bool *is_accumulator = NULL;
@@ -45,36 +45,57 @@ void scatter_accumulators(float accumulator_prob) {
 }
 
 void free_grid() {
-    if (grid_values != NULL) free(grid_values);
-    if (is_accumulator != NULL) free(is_accumulator);
+    if (grid_values != NULL) {
+        free(grid_values);
+        grid_values = NULL;
+    }
+    if (is_accumulator != NULL) {
+        free(is_accumulator);
+        is_accumulator = NULL;
+    }
 }
 
 void expunge_gaussian() {
-    Vector2DA means = {0};
-    for (size_t i = 0; i < slices_g; ++i) {
-        for (size_t j = 0; j < slices_g; ++j) {
-            if (GRID_ACCESS(is_accumulator, i, j)) {
-                float mean_x = (float)j;
-                float mean_y = (float)i;
-                Vector2 mean_pair = {.x = mean_x, .y = mean_y};
-                DA_APPEND(means, mean_pair);
-            }
-        }
-    }
-
     float* grid_values_copy = (float*) calloc(slices_g * slices_g, sizeof(float));
     COPY_ARR(grid_values_copy, grid_values, slices_g * slices_g);
-
+    
+    float* temp_array = (float*) calloc(slices_g * slices_g, sizeof(float));
+    size_t halflen = 3 * stddev;
     float max_intensity = FLT_MIN;
+
+    // first pass
     for (size_t i = 0; i < slices_g; ++i) {
         for (size_t j = 0; j < slices_g; ++j) {
-            for (size_t k = 0; k < means.count; ++k) {
-                Vector2 mean_pair = means.items[k];
-                GRID_ACCESS(grid_values, i, j) += gaussian2d_1std((float)j, (float)i, mean_pair.x, mean_pair.y, stddev);
-                max_intensity = fmax(max_intensity, GRID_ACCESS(grid_values, i, j));
+            size_t l = FIND_MAX(0, (int) j - (int) halflen);
+            size_t r = FIND_MIN(slices_g - 1, j + halflen);
+            for (size_t k = l; k <= r; ++k) {
+                GRID_ACCESS(temp_array, i, j) +=
+                    GRID_ACCESS(is_accumulator, i, k) * gaussian1d(
+                                                            (float) k,
+                                                            (float) j,
+                                                            stddev
+                                                        );
             }
         }
     }
+
+    for (size_t i = 0; i < slices_g; ++i) {
+        for (size_t j = 0; j < slices_g; ++j) {
+            size_t l = FIND_MAX(0, (int) i - (int) halflen);
+            size_t r = FIND_MIN(slices_g - 1, i + halflen);
+            for (size_t k = l; k <= r; ++k) {
+                GRID_ACCESS(grid_values, i, j) +=
+                    GRID_ACCESS(temp_array, k, j) * gaussian1d(
+                                                            (float) k,
+                                                            (float) i,
+                                                            stddev
+                                                        );
+            }
+            max_intensity = fmax(max_intensity, GRID_ACCESS(grid_values, i, j));
+        }
+    }
+
+    free(temp_array);
 
     for (size_t i = 0; i < slices_g; ++i) {
         for (size_t j = 0; j < slices_g; ++j) {
@@ -84,13 +105,14 @@ void expunge_gaussian() {
             }
         }
     }
-
-    free(means.items);
+    
+    free(grid_values_copy);
 }
 
 bool is_maxima(size_t i, size_t j) {
     bool up_good = 0, down_good = 0, left_good = 0, right_good = 0;
     float cur_value = GRID_ACCESS(grid_values, i, j);
+    if (float_equal(cur_value, 0.0f)) return false;
 
     up_good =
         (i == 0) ||
@@ -143,7 +165,7 @@ void color_grid(bool color_accumulators) {
 
             DrawRectangle(x, y, spacing_g, spacing_g, heatmap_cmap(GRID_ACCESS(grid_values, i, j)));
             if (GRID_ACCESS(is_accumulator, i, j) && color_accumulators) {
-                DrawCircle(x + (spacing_g / 2.0f), y + (spacing_g / 2.0f), (spacing_g / 2.0f), WHITE);
+                DrawCircle(x + (spacing_g / 2.0f), y + (spacing_g / 2.0f), (spacing_g * 0.3f), WHITE);
             }
         }
     }
@@ -172,7 +194,7 @@ void connect_accumulators() {
                 size_t j_row = (size_t)((j_closest_point.y - (spacing_g / 2.0f)) / spacing_g);
                 size_t j_col = (size_t)((j_closest_point.x - (spacing_g / 2.0f)) / spacing_g);
 
-                if (gaussian2d_1std(j_col, j_row, col, row, stddev) < 0.1f) continue;
+                if (gaussian2d(j_col, j_row, col, row, stddev) < 0.1f) continue;
 
                 DrawLineV(ref_point, accumulators_coord_copy[j + 1], WHITE);
             }

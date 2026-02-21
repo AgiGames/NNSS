@@ -8,12 +8,18 @@
 #include "raymath.h"
 #include "../globals/globals.h"
 
-float gaussian2d_1std(float x, float y, float mean_x, float mean_y, size_t stddev)
+float gaussian1d(float x, float mean, size_t stddev) {
+    float dx = x - mean;
+    float exponent = (-0.5f * (dx * dx)) / (float) (stddev * stddev);
+    return expf(exponent);
+}
+
+float gaussian2d(float x, float y, float mean_x, float mean_y, size_t stddev)
 {
     float dx = x - mean_x;
     float dy = y - mean_y;
 
-    float exponent = (-0.5f * (dx*dx + dy*dy)) / (float) stddev;
+    float exponent = (-0.5f * (dx*dx + dy*dy)) / (float) (stddev * stddev);
     return expf(exponent);
 }
 

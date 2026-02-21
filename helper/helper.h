@@ -46,13 +46,20 @@
 #define MEMB_SELECT(members, memb_index, memb_size) \
     ((void *)((char *)(members) + ((memb_size) * (memb_index))))
 
+#define FIND_MIN(a, b) \
+    ((a) < (b) ? (a) : (b))
+
+#define FIND_MAX(a, b) \
+    ((a) < (b) ? (b) : (a))
+
 typedef struct {
     Vector2* items;
     size_t count;
     size_t capacity;
 } Vector2DA;
 
-float gaussian2d_1std(float x, float y, float mean_x, float mean_y, size_t stddev);
+float gaussian2d(float x, float y, float mean_x, float mean_y, size_t stddev);
+float gaussian1d(float x, float mean, size_t stddev);
 bool float_equal(float a, float b);
 Color heatmap_cmap(float intensity);
 size_t qselect(void* base, size_t k, size_t num_elements, size_t element_size, int (*cmp)(const void*, const void*));

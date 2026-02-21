@@ -49,9 +49,9 @@ int main() {
         // if (IsKeyPressed(KEY_L)) {
         //     create_accumulators();
         // }
-        // if (IsKeyPressed(KEY_E)) {
-        //     expunge_gaussian();
-        // }
+        if (IsKeyPressed(KEY_E)) {
+            expunge_gaussian();
+        }
 
         if (show_grid) {
             color_grid(color_accumulators);
