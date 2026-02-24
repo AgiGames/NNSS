@@ -17,6 +17,7 @@ size_t stddev = 4;
 float *grid_values = NULL;
 bool *is_accumulator = NULL;
 Vector2DA accumulators = {0};
+PointPairDA connections = {0};
 Vector2 ref_point = {0};
 bool changed = false;
 
@@ -28,6 +29,7 @@ void init_grid(size_t window_size, size_t slices) {
     grid_values = (float*) calloc(slices * slices, sizeof(float));
     is_accumulator = (bool*) calloc(slices * slices, sizeof(bool));
     accumulators.count = 0;
+    connections.count = 0;
     changed = false;
 }
 
@@ -171,9 +173,18 @@ void color_grid(bool color_accumulators) {
     }
 }
 
+void draw_accumulator_connections() {
+    for (size_t i = 0; i < connections.count; ++i) {
+        PointPair pp = connections.items[i];
+        // DrawText("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB", 10, 10, 20, WHITE);
+        DrawLineV(pp.p1, pp.p2, WHITE);
+    }
+}
+
 void connect_accumulators() {
     Vector2 *accumulators_coord_copy = NULL;
     COPY_ARR(accumulators_coord_copy, accumulators.items, accumulators.count);
+    connections.count = 0;
 
     for (size_t i = 0; i < accumulators.count; ++i) {
         ref_point = accumulators.items[i];
@@ -195,8 +206,8 @@ void connect_accumulators() {
                 size_t j_col = (size_t)((j_closest_point.x - (spacing_g / 2.0f)) / spacing_g);
 
                 if (gaussian2d(j_col, j_row, col, row, stddev) < 0.1f) continue;
-
-                DrawLineV(ref_point, accumulators_coord_copy[j + 1], WHITE);
+                
+                DA_APPEND(connections, ((PointPair) {ref_point, accumulators_coord_copy[j + 1]}));
             }
         }
     }
@@ -209,6 +220,7 @@ void do_n_iterations() {
         changed = false;
         expunge_gaussian();
         create_accumulators();
+        connect_accumulators();
         if (changed == false) break;
     }
 }

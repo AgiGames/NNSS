@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #define WINDOW_SIZE 750
-#define GRID_SLICES 50
+#define GRID_SLICES 150
 #define ACCUMULATOR_PROB 0.025f
 
 int main() {
@@ -43,6 +43,7 @@ int main() {
         else if (IsKeyPressed(KEY_I)) {
             expunge_gaussian();
             create_accumulators();
+            connect_accumulators();
         }  
         
         // debug key listeners...
@@ -57,7 +58,7 @@ int main() {
             color_grid(color_accumulators);
         }
         if (show_connections) {
-            connect_accumulators();
+            draw_accumulator_connections();
         }
         const char* num_accumulators_text = TextFormat("%zu", get_num_accumulators());
         DrawText(num_accumulators_text, 10, 10, 50, GREEN);

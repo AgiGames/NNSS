@@ -58,6 +58,17 @@ typedef struct {
     size_t capacity;
 } Vector2DA;
 
+typedef struct {
+    Vector2 p1;
+    Vector2 p2;
+} PointPair;
+
+typedef struct {
+    PointPair* items;
+    size_t count;
+    size_t capacity;
+} PointPairDA;
+
 float gaussian2d(float x, float y, float mean_x, float mean_y, size_t stddev);
 float gaussian1d(float x, float mean, size_t stddev);
 bool float_equal(float a, float b);
