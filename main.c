@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #define WINDOW_SIZE 750
-#define GRID_SLICES 150
+#define GRID_SLICES 300
 #define ACCUMULATOR_PROB 0.025f
 
 int main() {

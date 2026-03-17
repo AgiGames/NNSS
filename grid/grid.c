@@ -182,37 +182,95 @@ void draw_accumulator_connections() {
 }
 
 void connect_accumulators() {
-    Vector2 *accumulators_coord_copy = NULL;
-    COPY_ARR(accumulators_coord_copy, accumulators.items, accumulators.count);
     connections.count = 0;
+    
+    // 1. Grid-based spatial partitioning
+    // We'll use a local grid to bucket points. Bucket size reflects the Gaussian reach.
+    float bucket_size = spacing_g * stddev * 2.0f;
+    size_t grid_w = ceilf((float)window_size_g / bucket_size);
+    size_t grid_h = ceilf((float)window_size_g / bucket_size);
+    
+    // Use an array of dynamic arrays (index buckets)
+    typedef struct {
+        size_t *indices;
+        size_t count;
+        size_t capacity;
+    } Bucket;
 
+    Bucket *grid = calloc(grid_w * grid_h, sizeof(Bucket));
+
+    // 2. Assign points to buckets
+    for (size_t i = 0; i < accumulators.count; ++i) {
+        size_t gx = fmaxf(0, fminf(grid_w - 1, floorf(accumulators.items[i].x / bucket_size)));
+        size_t gy = fmaxf(0, fminf(grid_h - 1, floorf(accumulators.items[i].y / bucket_size)));
+        Bucket *b = &grid[gy * grid_w + gx];
+        if (b->count >= b->capacity) {
+            b->capacity = b->capacity == 0 ? 8 : b->capacity * 2;
+            b->indices = realloc(b->indices, b->capacity * sizeof(size_t));
+        }
+        b->indices[b->count++] = i;
+    }
+
+    // 3. For each point, search only neighboring buckets and themselves
     for (size_t i = 0; i < accumulators.count; ++i) {
         ref_point = accumulators.items[i];
+        size_t gx = fmaxf(0, fminf(grid_w - 1, floorf(ref_point.x / bucket_size)));
+        size_t gy = fmaxf(0, fminf(grid_h - 1, floorf(ref_point.y / bucket_size)));
 
         size_t row = (size_t)((ref_point.y - (spacing_g / 2.0f)) / spacing_g);
         size_t col = (size_t)((ref_point.x - (spacing_g / 2.0f)) / spacing_g);
         float point_intensity = GRID_ACCESS(grid_values, row, col);
 
-        size_t num_connections = floor(point_intensity * accumulators.count);
-        if (num_connections < 2) num_connections = 2;
+        // Maximum filaments proportional to density
+        size_t max_filaments = floor(point_intensity * 10); // Heuristic scale
+        if (max_filaments < 2) max_filaments = 2;
 
-        qselect(accumulators_coord_copy, num_connections, accumulators.count, sizeof(Vector2), points_compar);
+        // Collect candidates from 3x3 buckets (local neighborhood)
+        Vector2 *candidates = malloc(128 * sizeof(Vector2)); // Temporary small buffer
+        size_t candidate_count = 0;
+        size_t candidate_cap = 128;
 
-        for (size_t j = 0; j < num_connections; ++j) {
-            if (j + 1 < accumulators.count) {
-                Vector2 j_closest_point = accumulators_coord_copy[j + 1];
+        for (int dy = -1; dy <= 1; ++dy) {
+            for (int dx = -1; dx <= 1; ++dx) {
+                int nx = (int)gx + dx;
+                int ny = (int)gy + dy;
+                if (nx < 0 || nx >= (int)grid_w || ny < 0 || ny >= (int)grid_h) continue;
 
-                size_t j_row = (size_t)((j_closest_point.y - (spacing_g / 2.0f)) / spacing_g);
-                size_t j_col = (size_t)((j_closest_point.x - (spacing_g / 2.0f)) / spacing_g);
+                Bucket *b = &grid[ny * grid_w + nx];
+                for (size_t j = 0; j < b->count; ++j) {
+                    size_t point_idx = b->indices[j];
+                    if (point_idx == i) continue; // Skip self
 
-                if (gaussian2d(j_col, j_row, col, row, stddev) < 0.1f) continue;
-                
-                DA_APPEND(connections, ((PointPair) {ref_point, accumulators_coord_copy[j + 1]}));
+                    if (candidate_count >= candidate_cap) {
+                        candidate_cap *= 2;
+                        candidates = realloc(candidates, candidate_cap * sizeof(Vector2));
+                    }
+                    candidates[candidate_count++] = accumulators.items[point_idx];
+                }
             }
         }
+
+        if (candidate_count > 0) {
+            size_t num_connect = fmin(candidate_count, max_filaments);
+            qselect(candidates, num_connect, candidate_count, sizeof(Vector2), points_compar);
+
+            for (size_t j = 0; j < num_connect; ++j) {
+                Vector2 closest = candidates[j];
+                size_t j_row = (size_t)((closest.y - (spacing_g / 2.0f)) / spacing_g);
+                size_t j_col = (size_t)((closest.x - (spacing_g / 2.0f)) / spacing_g);
+
+                if (gaussian2d(j_col, j_row, col, row, stddev) < 0.1f) continue;
+                DA_APPEND(connections, ((PointPair) {ref_point, closest}));
+            }
+        }
+        free(candidates);
     }
 
-    free(accumulators_coord_copy);
+    // Cleanup
+    for (size_t i = 0; i < grid_w * grid_h; ++i) {
+        if (grid[i].indices) free(grid[i].indices);
+    }
+    free(grid);
 }
 
 size_t do_n_iterations() {
