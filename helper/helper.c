@@ -39,24 +39,24 @@ Color color_lerp(Color c1, Color c2, float t) {
 }
 
 Color heatmap_cmap(float intensity) {
-    // Define color nodes for the cosmic web gradient
-    Color c0 = {5, 5, 15, 255};     // Deep space black/blue
-    Color c1 = {30, 10, 60, 255};    // Faint deep purple
-    Color c2 = {80, 25, 120, 255};   // Vibrant purple/blue
-    Color c3 = {150, 100, 255, 255}; // Bright cyan/purple node
-    Color c4 = {255, 255, 255, 255}; // Pure glowing white
+    // Viridis knots
+    Color c0 = {68, 1, 84, 255};   // Dark Purple
+    Color c1 = {59, 82, 139, 255};  // Blue
+    Color c2 = {33, 145, 140, 255};  // Teal/Green
+    Color c3 = {94, 201, 98, 255};  // Light Green
+    Color c4 = {253, 231, 37, 255}; // Yellow
 
-    if (intensity <= 0.05f) {
-        float t = intensity / 0.05f;
+    if (intensity <= 0.25f) {
+        float t = intensity / 0.25f;
         return color_lerp(c0, c1, t);
-    } else if (intensity <= 0.3f) {
-        float t = (intensity - 0.05f) / 0.25f;
+    } else if (intensity <= 0.5f) {
+        float t = (intensity - 0.25f) / 0.25f;
         return color_lerp(c1, c2, t);
-    } else if (intensity <= 0.7f) {
-        float t = (intensity - 0.3f) / 0.4f;
+    } else if (intensity <= 0.75f) {
+        float t = (intensity - 0.5f) / 0.25f;
         return color_lerp(c2, c3, t);
     } else {
-        float t = (intensity - 0.7f) / 0.3f;
+        float t = (intensity - 0.75f) / 0.25f;
         return color_lerp(c3, c4, t);
     }
 }
