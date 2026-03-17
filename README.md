@@ -92,4 +92,16 @@ A program that simulates formation of filaments from densities.
     gcc main.c grid/grid.c helper/helper.c -o filamenta -I$(brew --prefix)/include -L$(brew --prefix)/lib -lraylib -framework CoreVideo -framework IOKit -framework Cocoa -framework OpenGL
     ```
     
-- It should work.
+- **R**: Reset the grid.
+- **G**: Toggle grid visibility.
+- **A**: Toggle accumulator coloring.
+- **C**: Toggle connections visibility.
+- **T**: Toggle iteration count display.
+- **Y**: Toggle accumulator count display.
+- **I**: Run one iteration.
+- **Shift + I**: Run all iterations until stable.
+- **E**: Trigger an expunge iteration.
+
+### Visual Features
+- **Viridis Colormap**: Perceptually uniform color representation of densities.
+- **Smooth Interpolation**: No more blocky pixels when visualizing density gradients.
