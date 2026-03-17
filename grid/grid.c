@@ -215,14 +215,17 @@ void connect_accumulators() {
     free(accumulators_coord_copy);
 }
 
-void do_n_iterations() {
+size_t do_n_iterations() {
+    size_t iters = 0;
     while (true) {
         changed = false;
         expunge_gaussian();
         create_accumulators();
         connect_accumulators();
+        iters++;
         if (changed == false) break;
     }
+    return iters;
 }
 
 size_t get_num_accumulators() {

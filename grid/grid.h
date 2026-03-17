@@ -14,6 +14,6 @@ void create_accumulators();
 size_t get_num_accumulators();
 void connect_accumulators();
 void draw_accumulator_connections();
-void do_n_iterations();
+size_t do_n_iterations();
 
 #endif

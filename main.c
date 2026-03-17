@@ -18,6 +18,10 @@ int main() {
     bool show_grid = true;
     bool color_accumulators = true;
     bool show_connections = true;
+    bool show_iterations = true;
+    bool show_accumulator_count = true;
+
+    size_t iteration_count = 0;
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -27,6 +31,7 @@ int main() {
             free_grid();
             init_grid(WINDOW_SIZE, GRID_SLICES);
             scatter_accumulators(ACCUMULATOR_PROB);
+            iteration_count = 0;
         }
         if (IsKeyPressed(KEY_G)) {
             show_grid = !show_grid;
@@ -37,13 +42,20 @@ int main() {
         if (IsKeyPressed(KEY_C)) {
             show_connections = !show_connections;
         }
+        if (IsKeyPressed(KEY_T)) {
+            show_iterations = !show_iterations;
+        }
+        if (IsKeyPressed(KEY_Y)) {
+            show_accumulator_count = !show_accumulator_count;
+        }
         if (IsKeyDown(KEY_LEFT_SHIFT) && IsKeyPressed(KEY_I)) {
-            do_n_iterations();
+            iteration_count += do_n_iterations();
         }
         else if (IsKeyPressed(KEY_I)) {
             expunge_gaussian();
             create_accumulators();
             connect_accumulators();
+            iteration_count++;
         }  
         
         // debug key listeners...
@@ -60,8 +72,23 @@ int main() {
         if (show_connections) {
             draw_accumulator_connections();
         }
-        const char* num_accumulators_text = TextFormat("%zu", get_num_accumulators());
-        DrawText(num_accumulators_text, 10, 10, 50, GREEN);
+        
+        if (show_iterations) {
+            const char* iteration_text = TextFormat("Iteration: %zu", iteration_count);
+            DrawText(iteration_text, 10, WINDOW_SIZE - 60, 20, WHITE);
+        }
+        
+        if (show_accumulator_count) {
+            if (show_iterations) {
+                // Draw bottom left if iterations are showing to keep them grouped
+                const char* num_accumulators_text = TextFormat("Accumulators: %zu", get_num_accumulators());
+                DrawText(num_accumulators_text, 10, WINDOW_SIZE - 30, 20, GREEN);
+            } else {
+                // Draw large top left if iterations aren't showing
+                const char* num_accumulators_text = TextFormat("%zu", get_num_accumulators());
+                DrawText(num_accumulators_text, 10, 10, 50, GREEN);
+            }
+        }
 
         EndDrawing();
     }

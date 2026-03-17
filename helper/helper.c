@@ -29,15 +29,36 @@ bool float_equal(float a, float b) {
     return diff <= largest * 1e-6f;
 }
 
-Color heatmap_cmap(float intensity) {
-    if (intensity == 1.0f) {
-        return WHITE;
-    }
+Color color_lerp(Color c1, Color c2, float t) {
+    return (Color){
+        (unsigned char)(c1.r + (c2.r - c1.r) * t),
+        (unsigned char)(c1.g + (c2.g - c1.g) * t),
+        (unsigned char)(c1.b + (c2.b - c1.b) * t),
+        255
+    };
+}
 
-    if (intensity < 0.5f) {
-        return (Color) {255 * (intensity * 2), 0, 0, 255};
+Color heatmap_cmap(float intensity) {
+    // Define color nodes for the cosmic web gradient
+    Color c0 = {5, 5, 15, 255};     // Deep space black/blue
+    Color c1 = {30, 10, 60, 255};    // Faint deep purple
+    Color c2 = {80, 25, 120, 255};   // Vibrant purple/blue
+    Color c3 = {150, 100, 255, 255}; // Bright cyan/purple node
+    Color c4 = {255, 255, 255, 255}; // Pure glowing white
+
+    if (intensity <= 0.05f) {
+        float t = intensity / 0.05f;
+        return color_lerp(c0, c1, t);
+    } else if (intensity <= 0.3f) {
+        float t = (intensity - 0.05f) / 0.25f;
+        return color_lerp(c1, c2, t);
+    } else if (intensity <= 0.7f) {
+        float t = (intensity - 0.3f) / 0.4f;
+        return color_lerp(c2, c3, t);
+    } else {
+        float t = (intensity - 0.7f) / 0.3f;
+        return color_lerp(c3, c4, t);
     }
-    return (Color) {255, 255 * ((intensity - 0.5) * 2), 0, 255};
 }
 
 int points_compar(const void *a, const void *b) {
