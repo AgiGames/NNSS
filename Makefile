@@ -1,25 +1,16 @@
-# Makefile for Filamenta
+# Makefile for Filamenta (macOS)
 
 CC = gcc
 CFLAGS = -Wall -std=c99 -O2
 SRC = main.c grid/grid.c helper/helper.c
 TARGET = filamenta
+APP_NAME = Filamenta.app
 
-# Detect OS
-UNAME_S := $(shell uname -s)
-
-ifeq ($(UNAME_S), Linux)
-	LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
-endif
-
-ifeq ($(UNAME_S), Darwin)
-	# macOS paths for Homebrew
-	BREW_PATH := $(shell brew --prefix)
-	CFLAGS += -I$(BREW_PATH)/include
-	LDFLAGS = -L$(BREW_PATH)/lib
-	LIBS = -lraylib -lm -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
-	APP_NAME = Filamenta.app
-endif
+# macOS paths for Homebrew
+BREW_PATH := $(shell brew --prefix)
+CFLAGS += -I$(BREW_PATH)/include
+LDFLAGS = -L$(BREW_PATH)/lib
+LIBS = -lraylib -lm -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
 
 $(TARGET): $(SRC)
 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS) $(LIBS)
@@ -32,7 +23,6 @@ run: $(TARGET)
 	./$(TARGET)
 
 # macOS .app bundle
-ifeq ($(UNAME_S), Darwin)
 app: $(TARGET)
 	@echo "Creating macOS app bundle..."
 	@rm -rf $(APP_NAME)
@@ -70,7 +60,6 @@ app: $(TARGET)
 	@echo '  <true/>' >> $(APP_NAME)/Contents/Info.plist
 	@echo '</dict>' >> $(APP_NAME)/Contents/Info.plist
 	@echo '</plist>' >> $(APP_NAME)/Contents/Info.plist
-	@echo "✅ Created $(APP_NAME) — double-click to launch!"
-endif
+	@echo "✅ Created $(APP_NAME) — double-click to launch or run: open $(APP_NAME)"
 
 .PHONY: clean run app

@@ -4,90 +4,35 @@ A program that simulates formation of filaments from densities.
 ![](https://github.com/AgiGames/Filamenta/blob/main/images/nth_iteration.png)
 
 ### Prerequisites
-- Development Environment
+- **macOS** with [Homebrew](https://brew.sh) installed (Apple Silicon & Intel supported)
 
-    - **Linux** — Ubuntu or any distro with `apt` (other package managers work too).
-    - **Windows** — Use WSL:
-      
-        ```
-        wsl --install
-        ```
-        
-        or
-      
-        ```
-        wsl --install ubuntu
-        ```
-
-    - **macOS** — Requires [Homebrew](https://brew.sh). Tested on Apple Silicon & Intel.
-
-- Libraries
-
-    **Linux:**
-
-    Install git, cmake & build tools.
-  
-    ```
-    sudo apt update
-    sudo apt install build-essential git cmake
-    ```
-
-    Install X11 developer libraries.
-  
-    ```
-    sudo apt install libx11-dev libxrandr-dev libxi-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev
-    ```
-
-    Clone & build raylib (graphics library).
-  
-    ```
-    git clone https://github.com/raysan5/raylib.git
-    cd raylib
-    mkdir build && cd build
-    cmake ..
-    make -j$(nproc)
-    sudo make install
-    sudo ldconfig
-    ```
-
-    **macOS:**
-
-    Install raylib via Homebrew.
+- Install raylib:
 
     ```
     brew install raylib
     ```
 
-### Build & Run Application
+### Build & Run
+
 - Clone the repository.
 
     ```
     git clone git@github.com:AgiGames/Filamenta.git
     cd Filamenta
+    git checkout macos-support
     ```
 
-- Build and run using the Makefile (works on both Linux and macOS).
+- Build and run:
 
     ```
     make run
     ```
 
-- Or build and run manually:
-
-    **Linux:**
-    ```
-    gcc main.c grid/grid.c helper/helper.c -o filamenta -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 && ./filamenta
-    ```
-
-    **macOS:**
-    ```
-    gcc main.c grid/grid.c helper/helper.c -o filamenta $(pkg-config --cflags --libs raylib) -lm -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo && ./filamenta
-    ```
-
-- **macOS .app bundle** (double-clickable app):
+- Build as a macOS app (double-clickable `.app` bundle):
 
     ```
     make app
+    open Filamenta.app
     ```
 
 ### Controls
